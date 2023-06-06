@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Abstracts\IAuction;
+use App\Models\Abstracts\IBuyer;
+use App\Models\Abstracts\Model;
+use App\Response\Abstracts\Response;
 use App\Response\AuctionResponse;
 
-class Auction
+class Auction extends Model implements IAuction
 {
     private float $price;
     private array $bids;
     private float $highestPrice;
+    private IBuyer $winner;
 
     public function __construct(float $price)
     {
@@ -26,29 +31,41 @@ class Auction
 
         if($bid->getAmount() > $this->highestPrice)
         {
-            $this->highestPrice = $bid->getAmount();
+            $this->updateCurrentWinnerInfo($bid);
         }
 
         array_push($this->bids, $bid);
     }
 
-    public function start() : AuctionResponse
+    private function updateCurrentWinnerInfo(Bid $bid)
     {
-        $winnerBuyer = null;
+        $this->highestPrice = $bid->getAmount();
+        $this->winner = $bid->getBuyer();
+    }
+
+    public function start() : Response
+    {
+        return new AuctionResponse($this->getWinner(), $this->getWinnerPrice());
+    }
+
+    private function getWinner() : IBuyer
+    {
+        return $this->winner;
+    }
+
+    private function getWinnerPrice() : float
+    {
         $winnerPrice = 0;
 
         foreach($this->bids as $bid)
         {
+            $currentUserId = $bid->getBuyer()->getId();
             $bidAmount = $bid->getAmount();
-            if(($bidAmount > $winnerPrice) && ($bidAmount < $this->highestPrice))
+            if(($bidAmount > $winnerPrice) && ($bidAmount < $this->highestPrice) && ($currentUserId != $this->winner->getId()))
             {
                 $winnerPrice = $bidAmount;
             }
-            if($bidAmount == $this->highestPrice)
-            {
-                $winnerBuyer = $bid->getBuyer();
-            }
         }
-        return new AuctionResponse($winnerBuyer, $winnerPrice);
+        return $winnerPrice;
     }
 }

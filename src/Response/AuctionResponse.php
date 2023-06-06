@@ -2,20 +2,21 @@
 
 namespace App\Response;
 
-use App\Models\Buyer;
+use App\Models\Abstracts\IBuyer;
+use App\Response\Abstracts\Response;
 
-class AuctionResponse
+class AuctionResponse extends Response
 {
-    private ?Buyer $winner;
+    private ?IBuyer $winner;
     private float $winnerPrice;
 
-    public function __construct(?Buyer $winner, float $winnerPrice)
+    public function __construct(?IBuyer $winner, float $winnerPrice)
     {
         $this->winner = $winner;
         $this->winnerPrice = $winnerPrice;
     }
 
-    public function getWinner() : Buyer
+    public function getWinner() : IBuyer
     {
         return $this->winner;
     }

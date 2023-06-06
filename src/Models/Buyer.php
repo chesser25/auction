@@ -2,34 +2,20 @@
 
 namespace App\Models;
 
-class Buyer
+use App\Factories\Abstracts\IModelFactory;
+use App\Models\Abstracts\IBuyer;
+
+class Buyer extends User implements IBuyer
 {
-    private int $id;
-    private string $name;
-
-    public function getId() : int
+    private IModelFactory $modelFactory;
+    public function __construct(IModelFactory $modelFactory, int $id, string $name)
     {
-        return $this->id;
+        parent::__construct($id, $name);
+        $this->modelFactory = $modelFactory;
     }
-
-    public function setId(int $id) : void
-    {
-        $this->id = $id;
-    }
-
-    public function getName() : string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name) : void
-    {
-        $this->name = $name;
-    }
-
     public function makeBid(Auction $auction, float $amount) : void
     {
-        $bid = new Bid();
+        $bid = $this->modelFactory->create(Bid::class);
         $bid->setAmount($amount);
         $bid->setBuyer($this);
         

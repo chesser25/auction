@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
-class Bid
+use App\Models\Abstracts\IBuyer;
+use App\Models\Abstracts\Model;
+
+class Bid extends Model
 {
     private float $amount;
-    private Buyer $buyer;
+    private IBuyer $buyer;
 
     public function setAmount(float $amount) : void
     {
@@ -17,12 +20,12 @@ class Bid
         return $this->amount;
     }
 
-    public function setBuyer(Buyer $buyer) : void
+    public function setBuyer(IBuyer $buyer) : void
     {
         $this->buyer = $buyer;
     }
 
-    public function getBuyer() : Buyer
+    public function getBuyer() : IBuyer
     {
         return $this->buyer;
     }
