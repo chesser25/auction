@@ -13,6 +13,7 @@ class Buyer extends User implements IBuyer
         parent::__construct($id, $name);
         $this->modelFactory = $modelFactory;
     }
+    
     public function makeBid(Auction $auction, float $amount) : void
     {
         $bid = $this->modelFactory->create(Bid::class);

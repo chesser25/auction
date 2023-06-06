@@ -63,6 +63,7 @@ class AuctionTest extends BaseTest
     }
 }
 
+// Tests entrypoint
 $modelFactory = new ModelFactory();
 $price = 100;
 $auction = $modelFactory->create(Auction::class, ['price' => $price]);
