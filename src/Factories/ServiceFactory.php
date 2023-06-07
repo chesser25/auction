@@ -2,11 +2,11 @@
 
 namespace App\Factories;
 
+use App\Exceptions\MissingRequiredParamsException;
 use App\Factories\Abstracts\IServiceFactory;
 use App\Services\Abstracts\BaseService;
 use App\Services\Abstracts\IAuctionService;
 use App\Services\AuctionService;
-use Exception;
 
 class ServiceFactory implements IServiceFactory
 {
@@ -22,7 +22,7 @@ class ServiceFactory implements IServiceFactory
         }
         catch (\Exception $e)
         {
-            throw new Exception('Required additional params to create instance');
+            throw new MissingRequiredParamsException();
         }
     }
 }

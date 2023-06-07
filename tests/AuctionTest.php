@@ -2,12 +2,11 @@
 
 namespace App\Tests;
 
-require_once '../vendor/autoload.php';
-
+use App\Exceptions\AmountBelowZeroException;
 use App\Factories\Abstracts\IModelFactory;
-use App\Factories\ModelFactory;
-use App\Factories\ServiceFactory;
+use App\Models\Abstracts\IBuyer;
 use App\Models\Auction;
+use App\Models\Bid;
 use App\Models\Buyer;
 use App\Services\Abstracts\IAuctionService;
 use App\Tests\Abstracts\BaseTest;
@@ -25,53 +24,68 @@ class AuctionTest extends BaseTest
         $this->auction = $auction;
     }
 
-    public function test()
+    public function testAuction()
     {
-        // Arrange
         $buyerA = $this->modelFactory->create(Buyer::class, ['id' => 1, 'username' => 'buyerA']);
-        $buyerA->makeBid($this->auctionService, 110);
-        $buyerA->makeBid($this->auctionService, 130);
+        $this->testAddingBid($buyerA, 110);
+        $this->testAddingBid($buyerA, 130);
 
         $buyerB = $this->modelFactory->create(Buyer::class, ['id' => 2, 'username' => 'buyerB']);
-        $buyerB->makeBid($this->auctionService, 0);
-
+        
         $buyerC = $this->modelFactory->create(Buyer::class, ['id' => 3, 'username' => 'buyerC']);
-        $buyerC->makeBid($this->auctionService, 125);
-
+        $this->testAddingBid($buyerC, 125);
+        
         $buyerD = $this->modelFactory->create(Buyer::class, ['id' => 4, 'username' => 'buyerD']);
-        $buyerD->makeBid($this->auctionService, 105);
-        $buyerD->makeBid($this->auctionService, 115);
-        $buyerD->makeBid($this->auctionService, 90);
+        $this->testAddingBid($buyerD, 105);
+        $this->testAddingBid($buyerD, 115);
+        $this->testBidWithLowAmountIsNotAdded($buyerD, 90);
 
         $buyerE = $this->modelFactory->create(Buyer::class, ['id' => 5, 'username' => 'buyerE']);
-        $buyerE->makeBid($this->auctionService, 132);
-        $buyerE->makeBid($this->auctionService, 135);
-        $buyerE->makeBid($this->auctionService, 140);
+        $this->testAddingBid($buyerE, 132);
+        $this->testAddingBid($buyerE, 135);
+        $this->testAddingBid($buyerE, 140);
 
-        // Act
         $this->auctionService->start();
 
-        // Assert
         $expectedWinnerPrice = 130;
         $expectedWinner = $buyerE;
 
-        $isWinnerCorrect = assert($expectedWinner->getId() == $this->auction->getWinner()->getId(), 'Winner is wrong!');
-        $isWinnerPriceCorrect = assert($expectedWinnerPrice == $this->auction->getWinnerPrice(), 'Winner price is wrong!');
-        
-        // Show result
-        if($isWinnerCorrect && $isWinnerPriceCorrect)
-        {
-            var_export('Tests are successfull');
+        $this->assertEqual($expectedWinner->getId(), $this->auction->getWinner()->getId());
+        $this->assertEqual($expectedWinnerPrice, $this->auction->getWinnerPrice());
+    }
+
+    public function testAddingBidWithWrongAmount()
+    {
+        $buyerA = $this->modelFactory->create(Buyer::class, ['id' => 1, 'username' => 'buyerA']);
+        $exception = null;
+        try {
+            $wrongAmount = -1;
+            $buyerA->makeBid($this->auctionService, $wrongAmount);
+        } catch (\Exception $e) {
+            $exception = $e;
         }
+        $this->assertEqual(AmountBelowZeroException::class, get_class($exception));
+    }
+
+    // Helper functions
+    private function testAddingBid(IBuyer $buyer, int $amount)
+    {
+        $buyer->makeBid($this->auctionService, $amount);
+        $this->assertEqual($amount, $this->getLatestAddedBid()->getAmount());
+    }
+
+    private function testBidWithLowAmountIsNotAdded(IBuyer $buyer, int $amount)
+    {
+        $buyer->makeBid($this->auctionService, $amount);
+        $bids = array_filter($this->auction->getBids(), function(Bid $bid) use ($amount) {
+            return $bid->getAmount() == $amount;
+        });
+        $this->assertEmpty($bids);
+    }
+    
+    private function getLatestAddedBid() : Bid
+    {
+        $bids = $this->auction->getBids();
+        return end($bids);
     }
 }
-
-// Tests entrypoint
-$modelFactory = new ModelFactory();
-$price = 100;
-$auction = $modelFactory->create(Auction::class, ['price' => $price]);
-
-$serviceFactory = new ServiceFactory();
-$auctionService = $serviceFactory->create(IAuctionService::class, ['auction' => $auction]);
-
-(new AuctionTest($modelFactory, $auctionService, $auction))->test();

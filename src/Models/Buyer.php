@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\AmountBelowZeroException;
 use App\Factories\Abstracts\IModelFactory;
 use App\Models\Abstracts\IBuyer;
 use App\Services\Abstracts\IAuctionService;
@@ -17,6 +18,11 @@ class Buyer extends User implements IBuyer
     
     public function makeBid(IAuctionService $auctionService, int $amount) : void
     {
+        if($amount < 0)
+        {
+            throw new AmountBelowZeroException();
+        }
+
         $bid = $this->modelFactory->create(Bid::class);
         $bid->setAmount($amount);
         $bid->setBuyer($this);

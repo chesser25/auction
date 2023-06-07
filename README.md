@@ -1,6 +1,15 @@
-To validate that it works, you need:
-- launched local web server
-- clone the project to your server
-- inside the project you need to execute `composer install` command (I decided to use composer for autoloading classes)
-- then you may open your web browser and go to `http://your-server/auction/tests/AuctionTest.php`
-- as a result, you should see, that test was successfull
+Requirements:
+- installed php
+
+To validate that it works, you may follow 2 ways.
+First way:
+- clone the project
+- open bash terminal inside the project root
+- execute command `bash tests-runner.sh`
+- as a result there should be list of successfull tests
+
+Second way:
+- clone the project
+- execute composer install inside project's root
+- execute command `php src/Commands/TestsRunnerCommand.php`
+- as a result there should be list of successfull tests
