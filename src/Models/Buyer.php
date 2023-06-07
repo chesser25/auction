@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Factories\Abstracts\IModelFactory;
 use App\Models\Abstracts\IBuyer;
+use App\Services\Abstracts\IAuctionService;
 
 class Buyer extends User implements IBuyer
 {
@@ -14,12 +15,12 @@ class Buyer extends User implements IBuyer
         $this->modelFactory = $modelFactory;
     }
     
-    public function makeBid(Auction $auction, float $amount) : void
+    public function makeBid(IAuctionService $auctionService, int $amount) : void
     {
         $bid = $this->modelFactory->create(Bid::class);
         $bid->setAmount($amount);
         $bid->setBuyer($this);
         
-        $auction->addBid($bid);
+        $auctionService->addBid($bid);
     }
 }

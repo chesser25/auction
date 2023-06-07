@@ -2,9 +2,9 @@
 
 namespace App\Models\Abstracts;
 
-use App\Models\Auction;
+use App\Services\Abstracts\IAuctionService;
 
 interface IBuyer
 {
-    public function makeBid(Auction $auction, float $amount) : void;
+    public function makeBid(IAuctionService $iAuctionService, int $amount) : void;
 }

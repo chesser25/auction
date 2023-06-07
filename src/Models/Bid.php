@@ -7,15 +7,15 @@ use App\Models\Abstracts\Model;
 
 class Bid extends Model
 {
-    private float $amount;
+    private int $amount;
     private IBuyer $buyer;
 
-    public function setAmount(float $amount) : void
+    public function setAmount(int $amount) : void
     {
         $this->amount = $amount;
     }
 
-    public function getAmount() : float
+    public function getAmount() : int
     {
         return $this->amount;
     }

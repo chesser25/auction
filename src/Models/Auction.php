@@ -2,70 +2,54 @@
 
 namespace App\Models;
 
-use App\Models\Abstracts\IAuction;
 use App\Models\Abstracts\IBuyer;
 use App\Models\Abstracts\Model;
-use App\Response\Abstracts\Response;
-use App\Response\AuctionResponse;
 
-class Auction extends Model implements IAuction
+class Auction extends Model
 {
-    private float $price;
-    private array $bids;
-    private float $highestPrice;
+    private int $price;
+    private int $winnerPrice;
     private IBuyer $winner;
+    private array $bids;
 
     public function __construct(float $price)
     {
         $this->price = $price;
         $this->bids = [];
-        $this->highestPrice = 0;
     }
 
-    public function addBid(Bid $bid) : void
+    public function getPrice()
     {
-        if($bid->getAmount() < $this->price)
-        {
-            return;
-        }
-
-        if($bid->getAmount() > $this->highestPrice)
-        {
-            $this->updateCurrentWinnerInfo($bid);
-        }
-
-        array_push($this->bids, $bid);
+        return $this->price;
     }
 
-    private function updateCurrentWinnerInfo(Bid $bid)
-    {
-        $this->highestPrice = $bid->getAmount();
-        $this->winner = $bid->getBuyer();
-    }
-
-    public function start() : Response
-    {
-        return new AuctionResponse($this->getWinner(), $this->getWinnerPrice());
-    }
-
-    private function getWinner() : IBuyer
+    public function getWinner() : IBuyer
     {
         return $this->winner;
     }
 
-    private function getWinnerPrice() : float
+    public function setWinner(IBuyer $winner) : void
     {
-        $winnerPrice = 0;
+        $this->winner = $winner;
+    }
 
-        foreach($this->bids as $bid)
-        {
-            $currentUserId = $bid->getBuyer()->getId();
-            $bidAmount = $bid->getAmount();
-            if(($bidAmount > $winnerPrice) && ($bidAmount < $this->highestPrice) && ($currentUserId != $this->winner->getId()))
-            {
-                $winnerPrice = $bidAmount;
-            }
-        }
-        return $winnerPrice;
+    public function getWinnerPrice() : int
+    {
+        return $this->winnerPrice;
+    }
+    
+    public function setWinnerPrice(int $winnerPrice) : void
+    {
+        $this->winnerPrice = $winnerPrice;
+    }
+
+    public function getBids() : array
+    {
+        return $this->bids;
+    }
+
+    public function addBid(Bid $bid) : void
+    {
+        array_push($this->bids, $bid);
     }
 }
