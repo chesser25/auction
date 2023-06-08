@@ -18,16 +18,16 @@ use Exception;
 class AuctionTest extends BaseTest
 {
     public function prepare()
-	{
+    {
         $auction = new Auction(100);
 
-		$this->testData = [
+        $this->testData = [
             'auction' => $auction,
             'auction_service' => new AuctionService($auction),
-			'model_factory' => new ModelFactory(),
+            'model_factory' => new ModelFactory(),
             'service_factory' => new ServiceFactory()
-		];
-	}
+        ];
+    }
 
     /**
      * Test to validate Auction creation using ModelFactory
