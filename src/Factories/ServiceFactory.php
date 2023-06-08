@@ -7,6 +7,7 @@ use App\Factories\Abstracts\IServiceFactory;
 use App\Services\Abstracts\BaseService;
 use App\Services\Abstracts\IAuctionService;
 use App\Services\AuctionService;
+use TypeError;
 
 class ServiceFactory implements IServiceFactory
 {
@@ -20,7 +21,7 @@ class ServiceFactory implements IServiceFactory
                     return new AuctionService($params['auction']);
             }
         }
-        catch (\Exception $e)
+        catch (TypeError $e)
         {
             throw new MissingRequiredParamsException();
         }

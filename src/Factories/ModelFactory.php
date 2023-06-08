@@ -2,6 +2,7 @@
 
 namespace App\Factories;
 
+use App\Exceptions\AmountBelowZeroException;
 use App\Exceptions\MissingRequiredParamsException;
 use App\Exceptions\UserIdAlreadyExistsException;
 use App\Factories\Abstracts\IModelFactory;
@@ -9,6 +10,7 @@ use App\Models\Abstracts\Model;
 use App\Models\Auction;
 use App\Models\Bid;
 use App\Models\Buyer;
+use TypeError;
 
 class ModelFactory implements IModelFactory
 {
@@ -24,6 +26,10 @@ class ModelFactory implements IModelFactory
             switch($modelClass)
             {
                 case Auction::class:
+                    if($params['price'] < 0)
+                    {
+                        throw new AmountBelowZeroException();
+                    }
                     return new Auction($params['price']);
                 case Bid::class:
                     return new Bid();
@@ -32,10 +38,11 @@ class ModelFactory implements IModelFactory
                     {
                         throw new UserIdAlreadyExistsException();
                     }
+                    array_push($this->usersIds, $params['id']);
                     return new Buyer($this, $params['id'], $params['username']);
             }
         }
-        catch (\Exception $e)
+        catch (TypeError $e)
         {
             throw new MissingRequiredParamsException();
         }
