@@ -175,7 +175,8 @@ class AuctionTest extends BaseTest
         $expectedCount = 1;
         $this->assertCount($expectedCount, $this->testData['auction']->getBids());
 
-        $firstFoundBid = end($this->testData['auction']->getBids());
+        $bids = $this->testData['auction']->getBids();
+        $firstFoundBid = end($bids);
         $this->assertEqual($buyer->getId(), $firstFoundBid->getBuyer()->getId());
     }
 
