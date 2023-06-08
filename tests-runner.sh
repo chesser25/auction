@@ -1,7 +1,7 @@
-green=`tput setaf 2`
-reset=`tput sgr0`
+green=`tput setaf 2`;
+reset=`tput sgr0`;
 
-echo "${green}Tests started!${reset}"
-composer install
+echo "${green}Tests started!${reset}";
+composer install;
 php "${PWD}/src/Commands/TestsRunnerCommand.php";
-echo "${green}Tests finished!${reset}"
+echo "${green}Tests finished!${reset}";
